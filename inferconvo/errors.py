@@ -3,3 +3,6 @@ class NoTokenError(Exception):
 
 class InvalidToken(Exception):
     pass
+
+class CharacterLimitExceeded(Exception):
+    pass

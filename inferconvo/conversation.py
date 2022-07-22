@@ -1,6 +1,7 @@
 import requests
+import logging
 
-from .errors import NoTokenError
+from .errors import NoTokenError, CharacterLimitExceeded
 from .message import Message
 
 class Conversation:
@@ -20,7 +21,7 @@ class Conversation:
         self.heading = "A text conversation: "
 
     # Add a message to history, giving the AI more context
-    def add_message(self, mesage):
+    def add_message(self, message):
 
         self.context.append(message) # This whole function might be kinda useless, but it makes it so you dont need to interact with context at all
 
@@ -54,10 +55,18 @@ class Conversation:
         # Encourage the AI to generate a message from that author
         prompt_string += f"{author_to_generate}: "
 
+        # if len(prompt_string) > 3000:
+        #     raise CharacterLimitExceeded(f"Your context generates too many characters ({len(prompt_string)})")
+
         return prompt_string
 
     # Send the request to the AI
     def _request_new_text(self, prompt_string):
+
+        if len(prompt_string) > 3000:
+            logging.warning(f"Prompt string over 3000 characters ({len(prompt_string)}), it will be trimmed.")
+
+            prompt_string = prompt_string[-2999:]
 
         # Prompt json object
         prompt = {
